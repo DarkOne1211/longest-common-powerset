@@ -28,9 +28,11 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     // COPYING THE ARRAY INTO THE A 2D ARRAY
     int** geneSequence = copyDatatoMatrix(numberofElements, numberofArrays, readptr);
     
-    //-----------------WRITE CODE FOR LONGEST COMMON INCREASING SUBSEQUENCE (LCIS)------------------
+    //-----------------WRITE CODE FOR LONGEST COMMON INCREASING POWERSET------------------------
     
-    //-----------------------------------END OF LCIS CODE-------------------------------------------
+    
+
+    //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
     freeMatrix(geneSequence, numberofArrays);
@@ -65,9 +67,9 @@ int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr)
                 fclose(readptr);
                 return 0;
             }
-            //printf("%d ",geneSequence[i][j]); //Uncomment to print the matrix
+            //printf("%d ",geneSequence[i][j]); //Uncomment to print the matrix (FOR TESTING)
         }
-        //printf("\n"); //Uncomment to print the matrix
+        //printf("\n"); //Uncomment to print the matrix (FOR TESTING)
     }
     return geneSequence;
 }
