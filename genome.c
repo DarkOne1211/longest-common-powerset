@@ -6,7 +6,7 @@
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
 subset* createSubsetforgenome(int** geneSequence, int start, int end);
-
+subset* createSignificantPowesets(int** geneSequence, subset* Genome, int numberofElements, int numberofArrays);
 //----------------------START OF GENOME.C----------------------------
 int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
 {
@@ -32,7 +32,7 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     //-----------------WRITE CODE FOR LONGEST COMMON INCREASING POWERSET------------------------
     
     subset* NewSubset = createSubsetforgenome(geneSequence, 0, numberofElements);
-
+    NewSubset = createSignificantPowesets(geneSequence, NewSubset, numberofElements, numberofArrays);
     free(NewSubset);
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
@@ -100,4 +100,65 @@ subset* createSubsetforgenome(int** geneSequence, int start, int end)
     return newGenome;
 }
 
+int checkLocalPosition(int* geneSequence, int num1, int num2, int numberofElements)
+{
+    int i = 0;
+    int posnum1 = 0;
+    int posnum2 = 0;
+    for(i = 0; i < numberofElements; i++)
+    {
+        if(geneSequence[i] == num1)
+        {
+            posnum1 = i;
+        }
+        if(geneSequence[i] == num2)
+        {
+            posnum2 = i;
+        }
+    }
+    if(posnum1 < posnum2)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int checkRelativePosition(int** geneSequence, int num1, int num2, int numberofElements, int numberofArrays)
+{
+    int rowNumber = 1;
+    int localpos = 0;
+    for(rowNumber = 1; rowNumber < numberofArrays; rowNumber++)
+    {
+        localpos = checkLocalPosition(geneSequence[rowNumber],num1,num2,numberofElements);
+        if (localpos == 0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+subset* createSignificantPowesets(int** geneSequence, subset* Genome, int numberofElements, int numberofArrays)
+{
+    int start = 0;
+    int secondaryCounter = 0;
+    int end = numberofElements;
+    int pos = 0;
+    for(start = 0; start < end; start++)
+    {
+        for(secondaryCounter = start + 1; secondaryCounter < end; secondaryCounter++)
+        {
+            pos = checkRelativePosition(geneSequence, geneSequence[0][start],geneSequence[0][secondaryCounter], numberofElements, numberofArrays);
+            if(pos == 1)
+            {
+                //printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
+            }
+            else
+            {
+                //printf("Nothing happened\n");
+            }
+        }
+    }
+    return Genome;
+}
 //--------------------END OF HELPER FUCNTIONS------------------------
