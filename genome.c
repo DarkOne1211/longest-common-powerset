@@ -144,6 +144,8 @@ subset* createSignificantPowesets(int** geneSequence, subset* Genome, int number
     int secondaryCounter = 0;
     int end = numberofElements;
     int pos = 0;
+    // THIS VARIABLE WAS CREATED FOR THE PURPOSE OF TIME ANALYSIS
+    //int numberofComparisions = 0;
     for(start = 0; start < end; start++)
     {
         for(secondaryCounter = start + 1; secondaryCounter < end; secondaryCounter++)
@@ -157,8 +159,10 @@ subset* createSignificantPowesets(int** geneSequence, subset* Genome, int number
             {
                 //printf("Nothing happened\n");
             }
+            //numberofComparisions++;
         }
     }
+    //printf("Number of comparisions: %d\n", numberofComparisions);
     return Genome;
 }
 //--------------------END OF HELPER FUCNTIONS------------------------
