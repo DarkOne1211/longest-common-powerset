@@ -5,8 +5,8 @@
 // HELPER FUNCTION DECLARATIONS
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
-subset* createSubsetforgenome(int** geneSequence, int start, int end);
-subset* createSignificantPowesets(int** geneSequence, subset* Genome, int numberofElements, int numberofArrays);
+//subset* createSubsetforgenome(int** geneSequence, int start, int end);
+void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays);
 //----------------------START OF GENOME.C----------------------------
 int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
 {
@@ -31,9 +31,8 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     
     //-----------------WRITE CODE FOR LONGEST COMMON INCREASING POWERSET------------------------
     
-    subset* NewSubset = createSubsetforgenome(geneSequence, 0, numberofElements);
-    NewSubset = createSignificantPowesets(geneSequence, NewSubset, numberofElements, numberofArrays);
-    free(NewSubset);
+    createSignificantPowesets(geneSequence, numberofElements, numberofArrays);
+    
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
@@ -87,7 +86,7 @@ void freeMatrix(int** geneSequence, int numberofArrays)
     free(geneSequence);
 }
 
-subset* createSubsetforgenome(int** geneSequence, int start, int end)
+/*subset* createSubsetforgenome(int** geneSequence, int start, int end)
 {
     subset* newGenome = malloc(sizeof(subset)*end);
     int i = 0;
@@ -98,7 +97,7 @@ subset* createSubsetforgenome(int** geneSequence, int start, int end)
         //printf("LastNumber of subset %d: %d\n", i + 1, newGenome[i].LastNumber); // UNCOMMENT TO TEST IF SUBSET CREATION WORKED
     }
     return newGenome;
-}
+}*/
 
 int checkLocalPosition(int* geneSequence, int num1, int num2, int numberofElements)
 {
@@ -138,13 +137,13 @@ int checkRelativePosition(int** geneSequence, int num1, int num2, int numberofEl
     return 1;
 }
 
-subset* createSignificantPowesets(int** geneSequence, subset* Genome, int numberofElements, int numberofArrays)
+void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays)
 {
     int start = 0;
     int secondaryCounter = 0;
     int end = numberofElements;
     int pos = 0;
-    // THIS VARIABLE WAS CREATED FOR THE PURPOSE OF TIME ANALYSIS
+    // THIS VARIABLE WAS CREATED FOR THE PURPOSE OF TIME ANALYSIS 
     //int numberofComparisions = 0;
     for(start = 0; start < end; start++)
     {
@@ -153,7 +152,7 @@ subset* createSignificantPowesets(int** geneSequence, subset* Genome, int number
             pos = checkRelativePosition(geneSequence, geneSequence[0][start],geneSequence[0][secondaryCounter], numberofElements, numberofArrays);
             if(pos == 1)
             {
-                //printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
+                printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
             }
             else
             {
@@ -163,6 +162,5 @@ subset* createSignificantPowesets(int** geneSequence, subset* Genome, int number
         }
     }
     //printf("Number of comparisions: %d\n", numberofComparisions);
-    return Genome;
 }
 //--------------------END OF HELPER FUCNTIONS------------------------
