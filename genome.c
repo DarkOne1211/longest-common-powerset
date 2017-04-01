@@ -5,6 +5,7 @@
 // HELPER FUNCTION DECLARATIONS
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
+subset* createSubsetforgenome(int** geneSequence, int start, int end);
 
 //----------------------START OF GENOME.C----------------------------
 int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
@@ -30,8 +31,9 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     
     //-----------------WRITE CODE FOR LONGEST COMMON INCREASING POWERSET------------------------
     
-    
+    subset* NewSubset = createSubsetforgenome(geneSequence, 0, numberofElements);
 
+    free(NewSubset);
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
@@ -84,4 +86,18 @@ void freeMatrix(int** geneSequence, int numberofArrays)
     }
     free(geneSequence);
 }
+
+subset* createSubsetforgenome(int** geneSequence, int start, int end)
+{
+    subset* newGenome = malloc(sizeof(subset)*end);
+    int i = 0;
+    for(i = 0; i < end; i++)
+    {
+        newGenome[i].LastNumber = geneSequence[0][i];
+        newGenome[i].next = NULL;
+        //printf("LastNumber of subset %d: %d\n", i + 1, newGenome[i].LastNumber); // UNCOMMENT TO TEST IF SUBSET CREATION WORKED
+    }
+    return newGenome;
+}
+
 //--------------------END OF HELPER FUCNTIONS------------------------

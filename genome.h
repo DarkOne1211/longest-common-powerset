@@ -5,7 +5,7 @@
 
 typedef struct _Subset
 {
-    int *LastNumber;
+    int LastNumber;
     struct _Subset *next;
 }subset;
 
