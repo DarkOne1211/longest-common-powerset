@@ -5,8 +5,8 @@
 // HELPER FUNCTION DECLARATIONS
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
-//subset* createSubsetforgenome(int** geneSequence, int start, int end);
 void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays);
+
 //----------------------START OF GENOME.C----------------------------
 int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
 {
@@ -86,19 +86,6 @@ void freeMatrix(int** geneSequence, int numberofArrays)
     free(geneSequence);
 }
 
-/*subset* createSubsetforgenome(int** geneSequence, int start, int end)
-{
-    subset* newGenome = malloc(sizeof(subset)*end);
-    int i = 0;
-    for(i = 0; i < end; i++)
-    {
-        newGenome[i].LastNumber = geneSequence[0][i];
-        newGenome[i].next = NULL;
-        //printf("LastNumber of subset %d: %d\n", i + 1, newGenome[i].LastNumber); // UNCOMMENT TO TEST IF SUBSET CREATION WORKED
-    }
-    return newGenome;
-}*/
-
 int checkLocalPosition(int* geneSequence, int num1, int num2, int numberofElements)
 {
     int i = 0;
@@ -152,7 +139,7 @@ void createSignificantPowesets(int** geneSequence, int numberofElements, int num
             pos = checkRelativePosition(geneSequence, geneSequence[0][start],geneSequence[0][secondaryCounter], numberofElements, numberofArrays);
             if(pos == 1)
             {
-                printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
+                //printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
             }
             else
             {
