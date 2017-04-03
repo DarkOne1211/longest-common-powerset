@@ -49,7 +49,10 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     
     // FREEING A 2D ARRAY
     freeMatrix(geneSequence, numberofArrays);
-    fclose(readptr);
+    // FREEING THE GRAPH
+    freeGraph(subsetGraph);
+    // CLOSING THE OPENED FILE
+    fclose(readptr); 
     return NULL;
 }
 
