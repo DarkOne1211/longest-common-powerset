@@ -44,7 +44,8 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     int vertex = numberofElements;
     struct Graph* subsetGraph = createGraph(vertex);
     createSignificantPowesets(geneSequence, numberofElements, numberofArrays, subsetGraph);
-    freeGraph(subsetGraph);
+    
+    //printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
@@ -96,9 +97,9 @@ void insertEdge(Graph* graph, int src, int dest)
     graph->array[src].head = newNode;
 
     // UNCOMMENT IF YOU WANT THE GRAPH TO BE UNDIRECTIONAL
-    newNode = newAdjListNode(src);
+    /*newNode = newAdjListNode(src);
     newNode->next = graph->array[dest].head;
-    graph->array[dest].head = newNode;
+    graph->array[dest].head = newNode;*/
 }
 
 
