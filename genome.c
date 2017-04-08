@@ -7,12 +7,18 @@
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
 void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays, Graph* subsetGraph);
+
 // DECLARATIONS FOR GRAPH FUNCTIONS
 AdjListNode* newAdjListNode(int dest);
 Graph* createGraph(int V);
 void insertEdge(Graph* graph, int src, int dest);
 void printGraph(Graph* graph);
 void freeGraph(Graph* freeGraph);
+void longestchaininGraph(Graph* subsetGraph);
+
+// STACK FUNCTIONS
+void push(Stack *s, int vertex);
+void pop(Stack *s);
 
 //------------------------------------------------------------------------------------
 
@@ -44,8 +50,8 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     int vertex = numberofElements;
     struct Graph* subsetGraph = createGraph(vertex);
     createSignificantPowesets(geneSequence, numberofElements, numberofArrays, subsetGraph);
-    
-    //printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
+    longestchaininGraph(subsetGraph);
+    printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
@@ -68,6 +74,7 @@ AdjListNode* newAdjListNode(int dest)
 {
     AdjListNode* newNode = malloc(sizeof(AdjListNode));
     newNode->adjecent = dest;
+    newNode->weight = 0;
     newNode->next = NULL;
     return newNode;
 }
@@ -85,6 +92,7 @@ Graph* createGraph(int V)
     for(AdjListCounter = 0; AdjListCounter < V; AdjListCounter++)
     {
         newGraph->array[AdjListCounter].head = NULL;
+        newGraph->array[AdjListCounter].maxWeight = 1;
     }
     return newGraph;
 }
@@ -128,10 +136,10 @@ void printGraph(Graph* graph)
     for (v = 0; v < graph->vertex; ++v)
     {
         struct AdjListNode* pCrawl = graph->array[v].head;
-        printf("\n Adjacency list of vertex %d\n head ", v);
+        printf("\n Adjacency list of vertex %d with maxWeight %d\n head ", v+1, graph->array[v].maxWeight);
         while (pCrawl)
         {
-            printf("-> %d", pCrawl->adjecent);
+            printf("-> %d, %d", pCrawl->adjecent + 1, pCrawl->weight);
             pCrawl = pCrawl->next;
         }
         printf("\n");
@@ -245,4 +253,71 @@ void createSignificantPowesets(int** geneSequence, int numberofElements, int num
     }
     //printf("Number of comparisions: %d\n", numberofComparisions);
 }
+
+// FUNCTION TO RECURSIVELY FIND THE DISTANCE OF EACH NODE
+int addMaxWeight(Graph* graph, int vertex)
+{
+    AdjListNode* temp = graph->array[vertex].head;
+    int largestWeight = 0;
+    if(temp == NULL)
+    {
+        return 0;
+    }
+    largestWeight = temp->weight;
+    while(temp)
+    {
+        if(temp->weight > largestWeight)
+        {
+            largestWeight = temp->weight;
+        }
+        temp = temp->next;
+    }
+    return largestWeight;
+}
+
+int findNodeWeight(Graph *subsetGraph, char* visited, int number)
+{
+    if(visited[number] == 't')
+    {
+        return subsetGraph->array[number].maxWeight;
+    }
+    if(subsetGraph->array[number].head == NULL)
+    {
+        visited[number] = 't';
+        return subsetGraph->array[number].maxWeight;
+    }
+    visited[number] = 't';
+    AdjListNode *temp = subsetGraph->array[number].head;
+    while(temp)
+    {
+        temp->weight += findNodeWeight(subsetGraph,visited,temp->adjecent);
+        temp = temp->next;
+    }
+    subsetGraph->array[number].maxWeight += addMaxWeight(subsetGraph, number);
+    return 1;
+}
+
+// FUNCTION TO FIND THE LONGEST CHAIN IN THE GRAPH
+
+void longestchaininGraph(Graph* subsetGraph)
+{
+    Stack chain;
+    chain.stk = malloc(sizeof(int)*subsetGraph->vertex);
+    chain.top = -1;
+    chain.MAXSIZE = subsetGraph->vertex;
+    char* visited = malloc(sizeof(char)*subsetGraph->vertex);
+    int counter = 0;
+    for(counter = 0; counter < subsetGraph->vertex; counter++)
+    {
+        visited[counter] = 'f';
+    }
+    for(counter = 0; counter < subsetGraph->vertex; counter++)
+    {
+        findNodeWeight(subsetGraph, visited, counter);
+        //subsetGraph->array[counter].maxWeight += addMaxWeight(subsetGraph, counter);
+    }
+    free(chain.stk);
+    free(visited);
+}
+
 //--------------------END OF HELPER FUCNTIONS------------------------
