@@ -51,7 +51,7 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     struct Graph* subsetGraph = createGraph(vertex);
     createSignificantPowesets(geneSequence, numberofElements, numberofArrays, subsetGraph);
     longestchaininGraph(subsetGraph);
-    printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
+    //printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
@@ -294,7 +294,24 @@ int findNodeWeight(Graph *subsetGraph, char* visited, int number)
         temp = temp->next;
     }
     subsetGraph->array[number].maxWeight += addMaxWeight(subsetGraph, number);
-    return 1;
+    return subsetGraph->array[number].maxWeight;
+}
+
+int findLargestWeightedNode(Graph* subsetGraph)
+{
+    int nodeCounter = 0;
+    int largestWeight = 0;
+    int position = 0;
+    largestWeight = subsetGraph->array[0].maxWeight;
+    for(nodeCounter = 0; nodeCounter < subsetGraph->vertex; nodeCounter++)
+    {
+        if(largestWeight < subsetGraph->array[nodeCounter].maxWeight)
+        {
+            largestWeight = subsetGraph->array[nodeCounter].maxWeight;
+            position = nodeCounter;
+        }
+    }
+    return position;
 }
 
 // FUNCTION TO FIND THE LONGEST CHAIN IN THE GRAPH
@@ -314,8 +331,9 @@ void longestchaininGraph(Graph* subsetGraph)
     for(counter = 0; counter < subsetGraph->vertex; counter++)
     {
         findNodeWeight(subsetGraph, visited, counter);
-        //subsetGraph->array[counter].maxWeight += addMaxWeight(subsetGraph, counter);
     }
+    int position = findLargestWeightedNode(subsetGraph);
+    printf("Largest Node is at %d\n",position + 1);
     free(chain.stk);
     free(visited);
 }
