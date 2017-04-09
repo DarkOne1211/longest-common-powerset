@@ -14,7 +14,7 @@ Graph* createGraph(int V);
 void insertEdge(Graph* graph, int src, int dest);
 void printGraph(Graph* graph);
 void freeGraph(Graph* freeGraph);
-void longestchaininGraph(Graph* subsetGraph);
+Stack* longestchaininGraph(Graph* subsetGraph);
 
 // STACK FUNCTIONS
 void push(Stack *s, int vertex);
@@ -31,14 +31,17 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     FILE *readptr = fopen(filename,"rb");
     if(readptr == NULL)
     {
-        fprintf(stderr,"Failed to open input file");
-        return 0;
+        *size_of_seq = 0;
+        fprintf(stderr,"Failed to open input file\n");
+        return NULL;
     }
     int value1 = fread(&numberofElements, sizeof(int), 1, readptr);
     int value2 = fread(&numberofArrays, sizeof(int), 1, readptr);
     if(value1 + value2 != 2)
     {
-        return 0;
+        *size_of_seq = 0;
+        fprintf(stderr,"Failed to read input file\n");
+        return NULL;
     }
     
     // COPYING THE ARRAY INTO THE A 2D ARRAY
@@ -50,17 +53,28 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     int vertex = numberofElements;
     struct Graph* subsetGraph = createGraph(vertex);
     createSignificantPowesets(geneSequence, numberofElements, numberofArrays, subsetGraph);
-    longestchaininGraph(subsetGraph);
-    //printGraph(subsetGraph); // UNCOMMENT TO TEST THE GRAPH CREATION
+    Stack* longestSequence = longestchaininGraph(subsetGraph);
+    // COPYING FROM STACK TO THE INT ARRAY
+    int stackCounter = 0;
+    int* longestConservedGene = malloc(sizeof(int)*(longestSequence->top + 1));
+    for(stackCounter = 0; stackCounter <= longestSequence->top; stackCounter++)
+    {
+        longestConservedGene[stackCounter] = longestSequence->stk[stackCounter] + 1;
+    }
+    *size_of_seq = longestSequence->top + 1;
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
     // FREEING A 2D ARRAY
     freeMatrix(geneSequence, numberofArrays);
     // FREEING THE GRAPH
     freeGraph(subsetGraph);
+    // FREEING THE STACK ARRAY
+    free(longestSequence->stk);
+    // FREEING THE STACK
+    free(longestSequence);
     // CLOSING THE OPENED FILE
     fclose(readptr); 
-    return NULL;
+    return longestConservedGene;
 }
 
 //------------------END OF GENOME.C---------------------------------
@@ -234,8 +248,6 @@ void createSignificantPowesets(int** geneSequence, int numberofElements, int num
     int secondaryCounter = 0;
     int end = numberofElements;
     int pos = 0;
-    // THIS VARIABLE WAS CREATED FOR THE PURPOSE OF TIME ANALYSIS 
-    //int numberofComparisions = 0;
     for(start = 0; start < end; start++)
     {
         for(secondaryCounter = start + 1; secondaryCounter < end; secondaryCounter++)
@@ -246,12 +258,9 @@ void createSignificantPowesets(int** geneSequence, int numberofElements, int num
                 int src = geneSequence[0][start] - 1;
                 int dest = geneSequence[0][secondaryCounter] - 1;
                 insertEdge(subsetGraph, src, dest);
-                //printf("%d comes before %d in all arrays\n",geneSequence[0][start],geneSequence[0][secondaryCounter]);
             }
-            //numberofComparisions++;
         }
     }
-    //printf("Number of comparisions: %d\n", numberofComparisions);
 }
 
 // FUNCTION TO RECURSIVELY FIND THE DISTANCE OF EACH NODE
@@ -314,14 +323,61 @@ int findLargestWeightedNode(Graph* subsetGraph)
     return position;
 }
 
+// STACK OPERATIONS
+
+void push(Stack *s, int vertex)
+{
+    if(s->top >= s->MAXSIZE)
+    {
+        //fprintf(stderr, "Stack overflow");
+        return;
+    }
+    s->top += 1;
+    s->stk[s->top] = vertex;
+}
+
+void pop(Stack *s)
+{
+    if(s->top == -1)
+    {
+        fprintf(stderr, "Stack underflow");
+        return; 
+    }
+    s->top -= 1;
+}
+
+void copySequencetoStack(Graph* subsetGraph,int position,Stack* chain)
+{
+    if(subsetGraph->array[position].head == NULL)
+    {
+        push(chain, position);
+        return;
+    }
+    push(chain, position);
+    AdjListNode *temp = subsetGraph->array[position].head;
+    int largestAdjVertex = temp->weight;
+    int lvertex = 0;
+    while(temp)
+    {
+        if(largestAdjVertex <= temp->weight)
+        {
+            largestAdjVertex = temp->weight;
+            lvertex = temp->adjecent;
+        }
+        temp = temp->next;
+    }
+    copySequencetoStack(subsetGraph,lvertex,chain);
+    return;
+}
+
 // FUNCTION TO FIND THE LONGEST CHAIN IN THE GRAPH
 
-void longestchaininGraph(Graph* subsetGraph)
+Stack* longestchaininGraph(Graph* subsetGraph)
 {
-    Stack chain;
-    chain.stk = malloc(sizeof(int)*subsetGraph->vertex);
-    chain.top = -1;
-    chain.MAXSIZE = subsetGraph->vertex;
+    Stack* chain = malloc(sizeof(Stack));
+    chain->stk = malloc(sizeof(int)*subsetGraph->vertex);
+    chain->top = -1;
+    chain->MAXSIZE = subsetGraph->vertex;
     char* visited = malloc(sizeof(char)*subsetGraph->vertex);
     int counter = 0;
     for(counter = 0; counter < subsetGraph->vertex; counter++)
@@ -332,10 +388,13 @@ void longestchaininGraph(Graph* subsetGraph)
     {
         findNodeWeight(subsetGraph, visited, counter);
     }
+    //printGraph(subsetGraph);
     int position = findLargestWeightedNode(subsetGraph);
-    printf("Largest Node is at %d\n",position + 1);
-    free(chain.stk);
+    //printf("Largest Node is at %d\n",position + 1);
+    copySequencetoStack(subsetGraph,position,chain);
+    // COPIES THE LONGEST CHAIN FROM STACK TO ARRAY
     free(visited);
+    return chain;
 }
 
 //--------------------END OF HELPER FUCNTIONS------------------------
