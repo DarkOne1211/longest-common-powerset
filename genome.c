@@ -4,11 +4,12 @@
 
 //----------------------HELPER FUNCTION DECLARATIONS----------------------------------
 
+// DATA HANDLING FUNCTIONS
 int ** copyDatatoMatrix(int numberofElements, int numberofArrays, FILE* readptr);
 void freeMatrix(int** geneSequence,int numberofArrays);
 void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays, Graph* subsetGraph);
 
-// DECLARATIONS FOR GRAPH FUNCTIONS
+// GRAPH FUNCTIONS
 AdjListNode* newAdjListNode(int dest);
 Graph* createGraph(int V);
 void insertEdge(Graph* graph, int src, int dest);
