@@ -65,6 +65,7 @@ int *Longest_conserved_gene_sequence(char* filename, int *size_of_seq)
     *size_of_seq = longestSequence->top + 1;
     //-----------------------------------END OF MAIN MODULE CODE--------------------------------
     
+    //printGraph(subsetGraph);
     // FREEING A 2D ARRAY
     freeMatrix(geneSequence, numberofArrays);
     // FREEING THE GRAPH
@@ -205,63 +206,63 @@ void freeMatrix(int** geneSequence, int numberofArrays)
     free(geneSequence);
 }
 
-int checkLocalPosition(int* geneSequence, int num1, int num2, int numberofElements)
-{
-    int i = 0;
-    int posnum1 = 0;
-    int posnum2 = 0;
-    for(i = 0; i < numberofElements; i++)
-    {
-        if(geneSequence[i] == num1)
-        {
-            posnum1 = i;
-        }
-        if(geneSequence[i] == num2)
-        {
-            posnum2 = i;
-        }
-    }
-    if(posnum1 < posnum2)
-    {
-        return 1;
-    }
-    return 0;
-}
-
-int checkRelativePosition(int** geneSequence, int num1, int num2, int numberofElements, int numberofArrays)
-{
-    int rowNumber = 1;
-    int localpos = 0;
-    for(rowNumber = 1; rowNumber < numberofArrays; rowNumber++)
-    {
-        localpos = checkLocalPosition(geneSequence[rowNumber],num1,num2,numberofElements);
-        if (localpos == 0)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 void createSignificantPowesets(int** geneSequence, int numberofElements, int numberofArrays,Graph* subsetGraph)
 {
-    int start = 0;
-    int secondaryCounter = 0;
-    int end = numberofElements;
-    int pos = 0;
-    for(start = 0; start < end; start++)
+    int** adjecentMatrix;  
+    int i;
+    adjecentMatrix = malloc(numberofElements*sizeof(int*)); 
+    for (i = 0; i < numberofElements; i++)
     {
-        for(secondaryCounter = start + 1; secondaryCounter < end; secondaryCounter++)
+       adjecentMatrix[i] =  malloc(numberofElements*sizeof(int));
+    }
+    int rowCounter;
+    int colCounter;
+    int innercolCounter;
+    for(rowCounter = 0; rowCounter < numberofElements; rowCounter++)
+    {
+        for(colCounter = 0; colCounter < numberofElements; colCounter++)
         {
-            pos = checkRelativePosition(geneSequence, geneSequence[0][start],geneSequence[0][secondaryCounter], numberofElements, numberofArrays);
-            if(pos == 1)
+            adjecentMatrix[rowCounter][colCounter] = 0;
+        }
+    }
+    
+    for(rowCounter = 0; rowCounter < 1; rowCounter++)
+    {
+        for(colCounter = 0; colCounter < numberofElements - 1; colCounter++)
+        {
+            for(innercolCounter = colCounter + 1; innercolCounter < numberofElements; innercolCounter++)
             {
-                int src = geneSequence[0][start] - 1;
-                int dest = geneSequence[0][secondaryCounter] - 1;
-                insertEdge(subsetGraph, src, dest);
+                if((adjecentMatrix[(geneSequence[rowCounter][colCounter] - 1)][(geneSequence[rowCounter][innercolCounter] - 1)] == 0) & (rowCounter == 0))
+                    adjecentMatrix[(geneSequence[rowCounter][colCounter] - 1)][(geneSequence[rowCounter][innercolCounter] - 1)] = 1;
+            }    
+        }
+    }
+    
+    for(rowCounter = 1; rowCounter < numberofArrays; rowCounter++)
+    {
+        for(colCounter = numberofElements - 1; colCounter > 0; colCounter--)
+        {
+            for(innercolCounter = colCounter - 1; innercolCounter >= 0; innercolCounter--)
+            {
+                if(adjecentMatrix[(geneSequence[rowCounter][colCounter] - 1)][(geneSequence[rowCounter][innercolCounter] - 1)] == 1)
+                {
+                    adjecentMatrix[(geneSequence[rowCounter][colCounter] - 1)][(geneSequence[rowCounter][innercolCounter] - 1)] = 0;
+                }
+            }    
+        }
+    }
+
+    for(rowCounter = 0; rowCounter < numberofElements; rowCounter++)
+    {
+        for(colCounter = 0; colCounter < numberofElements; colCounter++)
+        {
+            if(adjecentMatrix[rowCounter][colCounter])
+            {
+                insertEdge(subsetGraph, rowCounter, colCounter);
             }
         }
     }
+    freeMatrix(adjecentMatrix, numberofElements);
 }
 
 // FUNCTION TO RECURSIVELY FIND THE DISTANCE OF EACH NODE
